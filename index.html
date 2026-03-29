@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <title>Swim Pace Calculator — Convert Distance &amp; Time to Pace per 100m / 100yd</title>
+  <meta name="description" content="Free swim pace calculator. Enter distance + time to get your pace per 100m or 100yd, or enter pace + distance to get your total swim time. Works for pool and open water — supports meters and yards.">
+  <meta name="keywords" content="swim pace calculator, swimming pace calculator, pace per 100m, swim time calculator, open water pace, swimming speed calculator, pace per 100 yards">
+  <!-- <link rel="canonical" href="https://yourdomain.com/"> -->
+
+  <!-- Open Graph -->
+  <meta property="og:type"        content="website">
+  <meta property="og:title"       content="Swim Pace Calculator">
+  <meta property="og:description" content="Convert distance + time to swim pace per 100m or 100yd — or calculate total swim time from pace. Free, instant, works for pool and open water.">
+
+  <!-- Structured data: WebApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Swim Pace Calculator",
+    "description": "Calculate swim pace per 100m or 100yd from distance and time, or find total swim time from pace and distance. Supports meters and yards.",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "Web",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "featureList": [
+      "Bidirectional pace calculation",
+      "Meters and yards support",
+      "Split times per 25m / 50m / 100m",
+      "Pace comparison table for common swim distances"
+    ]
+  }
+  </script>
+
+  <!-- Structured data: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "How do I calculate swim pace per 100m?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Divide your total swim time (in seconds) by the distance in metres, then multiply by 100. For example, swimming 1500m in 20 minutes (1200 seconds): 1200 ÷ 1500 × 100 = 80 seconds = 1:20 per 100m."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is a good swim pace per 100m?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A recreational swimmer typically averages 2:00–2:30 /100m. A fit age-grouper is around 1:30–2:00. Competitive masters swimmers often hold 1:10–1:30. Elite swimmers race at under 1:00 /100m."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I convert swim pace from per 100m to per 100 yards?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Multiply your pace per 100m by 0.9144 to get pace per 100 yards (since 100 yards = 91.44 metres). This calculator converts automatically when you switch the unit toggle."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:           #f1f5f9;
+      --card:         #ffffff;
+      --border:       #e2e8f0;
+      --divider:      #f1f5f9;
+      --primary:      #0284c7;
+      --primary-dk:   #0369a1;
+      --primary-lt:   #e0f2fe;
+      --primary-faint:#f0f9ff;
+      --accent-line:  #38bdf8;
+      --text:         #0f172a;
+      --text-2:       #334155;
+      --text-muted:   #64748b;
+      --radius:       16px;
+      --radius-sm:    9px;
+      --shadow:       0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.06);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem 1rem 5rem;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container { max-width: 480px; margin: 0 auto; }
+
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    h1 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -.03em;
+      line-height: 1.25;
+    }
+    .subtitle {
+      font-size: .73rem;
+      color: var(--text-muted);
+      margin-top: .2rem;
+      font-weight: 400;
+    }
+
+    /* ── Unit toggle ── */
+    .unit-toggle {
+      display: flex;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+      flex-shrink: 0;
+    }
+    .unit-btn {
+      padding: .28rem .9rem;
+      border-radius: 999px;
+      border: none;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: background .15s, color .15s;
+      font-family: inherit;
+      letter-spacing: -.01em;
+    }
+    .unit-btn.active { background: var(--primary); color: #fff; }
+
+    /* ── Calculator card ── */
+    .calc-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: .75rem;
+    }
+    .calc-divider { height: 1px; background: var(--border); }
+
+    /* ── Individual field inside card ── */
+    .calc-field {
+      padding: 1.1rem 1.25rem;
+      transition: background .2s;
+    }
+    .calc-field.is-computed {
+      background: var(--primary-faint);
+      box-shadow: inset 3px 0 0 var(--accent-line);
+    }
+
+    .field-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .8rem;
+    }
+    .field-name {
+      font-size: .63rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+    }
+    .result-badge {
+      font-size: .6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--primary);
+      background: var(--primary-lt);
+      padding: 2px 8px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+    .is-computed .result-badge { opacity: 1; }
+
+    .formula-hint {
+      font-size: .68rem;
+      color: var(--text-muted);
+      font-style: italic;
+      margin-top: .55rem;
+    }
+    .formula-hint.hidden { display: none; }
+
+    /* ── Preset chips ── */
+    .presets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem;
+      margin-bottom: .7rem;
+    }
+    .presets.hidden { display: none; }
+
+    .preset-chip {
+      padding: .24rem .65rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: .73rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-2);
+      transition: border-color .12s, color .12s, background .12s;
+      font-family: inherit;
+      letter-spacing: -.01em;
+    }
+    .preset-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-faint);
+    }
+    .preset-chip.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* ── Custom row ── */
+    .custom-row {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+    }
+    .custom-label {
+      font-size: .68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ── Inputs ── */
+    .input-row {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .input-group {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+    input[type="number"] {
+      width: 3.25rem;
+      padding: .45rem .2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 1.3rem;
+      font-weight: 600;
+      text-align: center;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      font-family: inherit;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -.02em;
+      transition: border-color .15s, box-shadow .15s;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    input[type="number"]:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(2,132,199,.13);
+    }
+    .inp-wide { width: 5rem; }
+    .inp-label {
+      font-size: .7rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .time-sep, .time-dot {
+      font-size: 1.35rem;
+      font-weight: 300;
+      color: #94a3b8;
+      line-height: 1;
+      align-self: center;
+    }
+
+    /* ── Results cards ── */
+    .results-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: .75rem;
+    }
+    .results-card.hidden { display: none; }
+
+    .card-title {
+      font-size: .63rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      padding: .8rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Splits */
+    .splits-list { padding: .25rem 0; }
+    .split-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .45rem 1.25rem;
+      border-bottom: 1px solid var(--divider);
+    }
+    .split-row:last-child { border-bottom: none; }
+    .split-label { font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+    .split-value { font-size: .875rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    /* Pace table */
+    .pace-table { width: 100%; border-collapse: collapse; }
+    .pace-table tr { border-bottom: 1px solid var(--divider); }
+    .pace-table tr:last-child { border-bottom: none; }
+    .pace-table td { padding: .45rem 1.25rem; }
+    .pace-table td:first-child { font-size: .8rem; color: var(--text-muted); font-weight: 500; }
+    .pace-table td:last-child { font-size: .875rem; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+    .pace-table tr.highlight td { color: var(--primary); }
+    .pace-table tr.highlight td:last-child { font-weight: 700; }
+
+    /* ── On-page SEO content ── */
+    .content-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      margin-bottom: .75rem;
+    }
+    .content-section h2 {
+      font-size: .63rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--text-muted);
+      padding: .8rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .content-body {
+      padding: .9rem 1.25rem;
+      font-size: .8rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+    .content-body p { margin-bottom: .6rem; }
+    .content-body p:last-child { margin-bottom: 0; }
+
+    .ref-table { width: 100%; border-collapse: collapse; margin-top: .4rem; }
+    .ref-table th {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--text-muted);
+      text-align: left;
+      padding: .35rem .5rem .35rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .ref-table th:last-child { text-align: right; }
+    .ref-table td {
+      font-size: .78rem;
+      padding: .38rem .5rem .38rem 0;
+      border-bottom: 1px solid var(--divider);
+      color: var(--text-2);
+    }
+    .ref-table tr:last-child td { border-bottom: none; }
+    .ref-table td:last-child { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+
+    .tri-table { width: 100%; border-collapse: collapse; margin-top: .4rem; }
+    .tri-table th {
+      font-size: .65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--text-muted);
+      padding: .35rem .4rem .35rem 0;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    .tri-table th:not(:first-child) { text-align: right; }
+    .tri-table td {
+      font-size: .77rem;
+      padding: .38rem .4rem .38rem 0;
+      border-bottom: 1px solid var(--divider);
+      color: var(--text-2);
+    }
+    .tri-table tr:last-child td { border-bottom: none; }
+    .tri-table td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 2rem 0 .5rem;
+      font-size: .68rem;
+      color: var(--text-muted);
+      opacity: .4;
+    }
+
+    @media (max-width: 400px) {
+      body { padding: 1rem .75rem 4rem; }
+      h1 { font-size: 1.05rem; }
+      .calc-field { padding: .9rem 1rem; }
+      .split-row, .pace-table td, .card-title { padding-left: 1rem; padding-right: 1rem; }
+      .content-body, .content-section h2 { padding-left: 1rem; padding-right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div>
+      <h1>Swim Pace Calculator</h1>
+      <p class="subtitle">Enter any two values — the third is calculated</p>
+    </div>
+    <div class="unit-toggle">
+      <button class="unit-btn active" onclick="switchUnit('m')">Meters</button>
+      <button class="unit-btn"        onclick="switchUnit('yd')">Yards</button>
+    </div>
+  </header>
+
+  <!-- ── Calculator card ── -->
+  <div class="calc-card">
+
+    <!-- Distance -->
+    <div class="calc-field" id="fg-distance">
+      <div class="field-top">
+        <span class="field-name">Distance</span>
+        <span class="result-badge" id="badge-distance">Result</span>
+      </div>
+      <div class="presets" id="presets-m"></div>
+      <div class="presets hidden" id="presets-yd"></div>
+      <div class="custom-row">
+        <span class="custom-label">Other:</span>
+        <input type="number" id="inp-dist" class="inp-wide" min="1" step="1"
+               placeholder="—" oninput="onEdit('distance')" style="font-size:1rem; letter-spacing:0">
+        <span class="inp-label" id="dist-unit-label">m</span>
+      </div>
+      <p class="formula-hint hidden" id="hint-distance"></p>
+    </div>
+
+    <div class="calc-divider"></div>
+
+    <!-- Total Time -->
+    <div class="calc-field" id="fg-time">
+      <div class="field-top">
+        <span class="field-name">Total Time</span>
+        <span class="result-badge" id="badge-time">Result</span>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <input type="number" id="inp-min" min="0" max="999" placeholder="mm"
+                 oninput="onEdit('time')" style="width:4rem">
+          <span class="inp-label">m</span>
+        </div>
+        <span class="time-sep">:</span>
+        <div class="input-group">
+          <input type="number" id="inp-sec" min="0" max="59" placeholder="ss"
+                 oninput="onEdit('time')">
+          <span class="inp-label">s</span>
+        </div>
+      </div>
+      <p class="formula-hint hidden" id="hint-time"></p>
+    </div>
+
+    <div class="calc-divider"></div>
+
+    <!-- Pace -->
+    <div class="calc-field" id="fg-pace">
+      <div class="field-top">
+        <span class="field-name" id="pace-label">Pace / 100m</span>
+        <span class="result-badge" id="badge-pace">Result</span>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <input type="number" id="inp-pm" min="0" max="99" placeholder="m"
+                 oninput="onEdit('pace')">
+          <span class="inp-label">m</span>
+        </div>
+        <span class="time-sep">:</span>
+        <input type="number" id="inp-ps" min="0" max="59" placeholder="ss"
+               oninput="onEdit('pace')" style="width:3.25rem">
+        <span class="time-dot">.</span>
+        <input type="number" id="inp-ph" min="0" max="99" placeholder="hh"
+               oninput="onEdit('pace')" style="width:3.25rem">
+      </div>
+      <p class="formula-hint hidden" id="hint-pace"></p>
+    </div>
+
+  </div><!-- /.calc-card -->
+
+  <!-- ── Splits ── -->
+  <div class="results-card hidden" id="splits-section">
+    <div class="card-title">Splits</div>
+    <div class="splits-list" id="splits-content"></div>
+  </div>
+
+  <!-- ── Pace reference table ── -->
+  <div class="results-card hidden" id="table-section">
+    <div class="card-title">At this pace&hellip;</div>
+    <table class="pace-table" id="pace-table"></table>
+  </div>
+
+  <!-- ── On-page SEO content ── -->
+  <div class="content-section">
+    <h2>What is a good swim pace per 100m?</h2>
+    <div class="content-body">
+      <table class="ref-table" aria-label="Swim pace benchmarks per 100m">
+        <thead>
+          <tr>
+            <th>Level</th>
+            <th>Pace / 100m</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Beginner</td><td>2:30 – 3:00+</td></tr>
+          <tr><td>Recreational</td><td>2:00 – 2:30</td></tr>
+          <tr><td>Fit age-grouper</td><td>1:30 – 2:00</td></tr>
+          <tr><td>Competitive masters</td><td>1:10 – 1:30</td></tr>
+          <tr><td>Elite open water</td><td>sub 1:05</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>Triathlon swim pace guide</h2>
+    <div class="content-body">
+      <p>Use the table below as a rough target for your swim split. These are based on typical age-group finish times.</p>
+      <table class="tri-table" aria-label="Triathlon swim pace targets">
+        <thead>
+          <tr>
+            <th>Race</th>
+            <th>Distance</th>
+            <th>Beginner target</th>
+            <th>Age-group target</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Sprint</td>
+            <td>750 m</td>
+            <td>2:00 /100m</td>
+            <td>1:30 /100m</td>
+          </tr>
+          <tr>
+            <td>Olympic</td>
+            <td>1500 m</td>
+            <td>2:00 /100m</td>
+            <td>1:35 /100m</td>
+          </tr>
+          <tr>
+            <td>70.3</td>
+            <td>1900 m</td>
+            <td>2:10 /100m</td>
+            <td>1:40 /100m</td>
+          </tr>
+          <tr>
+            <td>Ironman</td>
+            <td>3800 m</td>
+            <td>2:20 /100m</td>
+            <td>1:45 /100m</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="content-section">
+    <h2>How to use this calculator</h2>
+    <div class="content-body">
+      <p>Fill in any <strong>two</strong> of the three fields — Distance, Total Time, or Pace. The third is calculated automatically and highlighted in blue.</p>
+      <p><strong>Know your distance and time?</strong> Enter both and read your pace. Use the preset buttons for common pool and open-water distances, or type any distance in the "Other" field.</p>
+      <p><strong>Know your pace and want a goal time?</strong> Enter your pace and the race distance — the calculator shows your projected finish time.</p>
+      <p>Toggle between <strong>Meters</strong> and <strong>Yards</strong> at any time. All values convert automatically.</p>
+    </div>
+  </div>
+
+  <footer>Swim Pace Calculator &mdash; free &amp; runs entirely in your browser</footer>
+
+</div><!-- /.container -->
+
+<script>
+  // ────────────────────────────────────────────
+  //  State
+  // ────────────────────────────────────────────
+  let unit = 'm';
+  let editOrder = []; // most-recently-edited first
+  let isUpdating = false;
+
+  const PRESETS = {
+    m:  [100, 200, 400, 800, 1500, 1900, 3800],
+    yd: [100, 200, 500, 1000, 1650, 2112, 4224],
+  };
+  const PRESET_LABELS = {
+    m:  { 100:'100m', 200:'200m', 400:'400m', 800:'800m',
+          1500:'1500m', 1900:'1.9km', 3800:'3.8km' },
+    yd: { 100:'100yd', 200:'200yd', 500:'500yd', 1000:'1000yd',
+          1650:'1650yd', 2112:'1.2mi', 4224:'2.4mi' },
+  };
+  const TABLE_DISTS = {
+    m:  [100, 200, 400, 800, 1500, 1900, 3800],
+    yd: [100, 200, 500, 1000, 1650, 2112, 4224],
+  };
+  const TABLE_LABELS = {
+    m: { 100:'100 m', 200:'200 m', 400:'400 m', 800:'800 m',
+         1500:'1500 m', 1900:'1900 m · OW Sprint', 3800:'3800 m · OW Full' },
+    yd:{ 100:'100 yd', 200:'200 yd', 500:'500 yd', 1000:'1000 yd',
+         1650:'1650 yd · 1 mile', 2112:'2112 yd · 1.2 mi', 4224:'4224 yd · 2.4 mi' },
+  };
+  const FORMULA_HINTS = {
+    pace:     'calculated from distance and time',
+    time:     'calculated from distance and pace',
+    distance: 'calculated from time and pace',
+  };
+
+  // ────────────────────────────────────────────
+  //  Build preset chips
+  // ────────────────────────────────────────────
+  function buildPresets() {
+    ['m', 'yd'].forEach(u => {
+      const c = document.getElementById('presets-' + u);
+      c.innerHTML = PRESETS[u].map(d =>
+        `<button class="preset-chip" data-dist="${d}" data-unit="${u}"
+                 onclick="clickPreset(${d},'${u}')">${PRESET_LABELS[u][d]}</button>`
+      ).join('');
+    });
+  }
+
+  function clickPreset(val, pu) {
+    setDistInput(val);
+    markEdited('distance');
+    document.querySelectorAll('.preset-chip').forEach(el => el.classList.remove('active'));
+    document.querySelector(`.preset-chip[data-dist="${val}"][data-unit="${pu}"]`)
+            ?.classList.add('active');
+    calculate();
+  }
+
+  // ────────────────────────────────────────────
+  //  Unit switching — converts existing values
+  // ────────────────────────────────────────────
+  function switchUnit(newUnit) {
+    if (newUnit === unit) return;
+    document.querySelectorAll('.unit-btn').forEach(btn =>
+      btn.classList.toggle('active', btn.textContent === (newUnit === 'm' ? 'Meters' : 'Yards'))
+    );
+    const dist = getDistInput();
+    const pace = getPaceInput();
+    if (newUnit === 'yd') {
+      if (dist !== null) setDistInput(Math.round(dist * 1.09361));
+      if (pace !== null) setPaceInput(pace * 0.9144);
+    } else {
+      if (dist !== null) setDistInput(Math.round(dist * 0.9144));
+      if (pace !== null) setPaceInput(pace / 0.9144);
+    }
+    unit = newUnit;
+    document.getElementById('presets-m').classList.toggle('hidden', unit !== 'm');
+    document.getElementById('presets-yd').classList.toggle('hidden', unit !== 'yd');
+    document.getElementById('dist-unit-label').textContent = unit;
+    document.getElementById('pace-label').textContent = `Pace / 100${unit}`;
+    document.querySelectorAll('.preset-chip').forEach(el => el.classList.remove('active'));
+    calculate();
+  }
+
+  // ────────────────────────────────────────────
+  //  Edit tracking
+  // ────────────────────────────────────────────
+  function onEdit(field) {
+    if (isUpdating) return;
+    markEdited(field);
+    if (field === 'distance')
+      document.querySelectorAll('.preset-chip').forEach(el => el.classList.remove('active'));
+    calculate();
+  }
+
+  function markEdited(field) {
+    editOrder = [field, ...editOrder.filter(f => f !== field)];
+  }
+
+  function getComputedField() {
+    if (editOrder.length >= 2)
+      return ['distance','time','pace'].find(f => !editOrder.slice(0,2).includes(f));
+    return null;
+  }
+
+  // ────────────────────────────────────────────
+  //  Value getters / setters
+  // ────────────────────────────────────────────
+  function getDistInput() {
+    const v = parseFloat(document.getElementById('inp-dist').value);
+    return isNaN(v) || v <= 0 ? null : v;
+  }
+  function setDistInput(val) {
+    isUpdating = true;
+    document.getElementById('inp-dist').value = val !== null ? Math.round(val * 10) / 10 : '';
+    isUpdating = false;
+  }
+
+  function getTimeInput() {
+    const mEl = document.getElementById('inp-min');
+    const sEl = document.getElementById('inp-sec');
+    if (!mEl.value.trim() && !sEl.value.trim()) return null;
+    const t = (parseFloat(mEl.value)||0)*60 + (parseFloat(sEl.value)||0);
+    return t > 0 ? t : null;
+  }
+  function setTimeInput(totalSec) {
+    isUpdating = true;
+    totalSec = Math.round(totalSec);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    document.getElementById('inp-min').value = m > 0 ? m : '';
+    document.getElementById('inp-sec').value = (s > 0 || m > 0) ? String(s).padStart(2,'0') : '';
+    isUpdating = false;
+  }
+  function clearTimeInput() {
+    isUpdating = true;
+    ['inp-min','inp-sec'].forEach(id => document.getElementById(id).value = '');
+    isUpdating = false;
+  }
+
+  function getPaceInput() {
+    const mEl = document.getElementById('inp-pm');
+    const sEl = document.getElementById('inp-ps');
+    const hEl = document.getElementById('inp-ph');
+    if (!mEl.value.trim() && !sEl.value.trim() && !hEl.value.trim()) return null;
+    const t = (parseFloat(mEl.value)||0)*60
+            + (parseFloat(sEl.value)||0)
+            + (parseFloat(hEl.value)||0)/100;
+    return t > 0 ? t : null;
+  }
+  function setPaceInput(totalSec) {
+    isUpdating = true;
+    totalSec = Math.max(0, totalSec);
+    const m  = Math.floor(totalSec / 60);
+    const s  = Math.floor(totalSec % 60);
+    const hh = Math.round((totalSec - Math.floor(totalSec)) * 100);
+    document.getElementById('inp-pm').value = m;
+    document.getElementById('inp-ps').value = String(s).padStart(2,'0');
+    document.getElementById('inp-ph').value = String(hh).padStart(2,'0');
+    isUpdating = false;
+  }
+  function clearPaceInput() {
+    isUpdating = true;
+    document.getElementById('inp-pm').value = '';
+    document.getElementById('inp-ps').value = '';
+    document.getElementById('inp-ph').value = '';
+    isUpdating = false;
+  }
+
+  // ────────────────────────────────────────────
+  //  Core calculation
+  // ────────────────────────────────────────────
+  function calculate() {
+    const computed = getComputedField();
+
+    // Update field styling + formula hints
+    ['distance','time','pace'].forEach(f => {
+      document.getElementById('fg-' + f).classList.toggle('is-computed', f === computed);
+      const hint = document.getElementById('hint-' + f);
+      if (hint) {
+        const show = f === computed && !!computed;
+        hint.classList.toggle('hidden', !show);
+        if (show) hint.textContent = FORMULA_HINTS[f];
+      }
+    });
+
+    if (!computed) { updateResults(); return; }
+
+    if (computed === 'pace') {
+      const d = getDistInput(), t = getTimeInput();
+      d && t ? setPaceInput((t/d)*100) : clearPaceInput();
+    } else if (computed === 'time') {
+      const d = getDistInput(), p = getPaceInput();
+      d && p ? setTimeInput((d/100)*p) : clearTimeInput();
+    } else {
+      const t = getTimeInput(), p = getPaceInput();
+      t && p ? setDistInput((t/p)*100) : setDistInput(null);
+    }
+
+    updateResults();
+  }
+
+  // ────────────────────────────────────────────
+  //  Results: splits + pace table
+  // ────────────────────────────────────────────
+  function updateResults() {
+    const pace = getPaceInput();
+    const dist = getDistInput();
+
+    if (!pace) {
+      document.getElementById('splits-section').classList.add('hidden');
+      document.getElementById('table-section').classList.add('hidden');
+      return;
+    }
+
+    // Splits
+    const splitDists = getSplitDistances(dist);
+    document.getElementById('splits-content').innerHTML = splitDists.map(d =>
+      `<div class="split-row">
+        <span class="split-label">${d} ${unit}</span>
+        <span class="split-value">${formatTime((d/100)*pace)}</span>
+      </div>`
+    ).join('');
+    document.getElementById('splits-section').classList.remove('hidden');
+
+    // Pace table
+    const currentRounded = dist ? Math.round(dist) : null;
+    document.getElementById('pace-table').innerHTML = TABLE_DISTS[unit].map(d => {
+      const isCurrent = currentRounded && Math.abs(d - currentRounded) < 1;
+      return `<tr class="${isCurrent ? 'highlight' : ''}">
+        <td>${TABLE_LABELS[unit][d]}</td>
+        <td>${formatTime((d/100)*pace)}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('table-section').classList.remove('hidden');
+  }
+
+  function getSplitDistances(dist) {
+    const all  = [25, 50, 100, 200, 400, 500, 800, 1000, 1500, 1900, 2000, 3800, 4224];
+    const cap  = dist || 100;
+    const base = [25, 50, 100].filter(d => d <= cap);
+    const more = all.filter(d => d <= cap && d > 100);
+    return [...new Set([...base, ...more])].sort((a,b) => a-b) || [cap];
+  }
+
+  // ────────────────────────────────────────────
+  //  Formatting
+  // ────────────────────────────────────────────
+  function formatTime(s) {
+    if (!isFinite(s) || s < 0) return '—';
+    s = Math.round(s);
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    return h > 0
+      ? `${h}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`
+      : `${m}:${String(sec).padStart(2,'0')}`;
+  }
+
+  // ────────────────────────────────────────────
+  //  Init
+  // ────────────────────────────────────────────
+  buildPresets();
+</script>
+</body>
+</html>
