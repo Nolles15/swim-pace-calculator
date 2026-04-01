@@ -211,29 +211,13 @@
     .formula-hint.hidden { display: none; }
 
     /* ── Preset chips ── */
-    .presets-wrap {
-      position: relative;
-      margin-bottom: .7rem;
-    }
+    .presets-wrap { margin-bottom: .75rem; }
     .presets-wrap.hidden { display: none; }
-    .presets-wrap::after {
-      content: '';
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 2rem;
-      background: linear-gradient(to right, transparent, var(--card));
-      pointer-events: none;
-    }
     .presets {
       display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: .3rem;
-      scrollbar-width: none;
-      -webkit-overflow-scrolling: touch;
-      padding-right: 1.5rem;
+      flex-wrap: wrap;
+      gap: .45rem;
     }
-    .presets::-webkit-scrollbar { display: none; }
     .presets.hidden { display: none; }
 
     /* ── Visually hidden labels (accessibility) ── */
@@ -248,21 +232,20 @@
     }
 
     .preset-chip {
-      padding: .38rem .75rem;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: transparent;
-      font-size: .78rem;
+      height: 44px;
+      padding: 0 1.1rem;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-size: .875rem;
       font-weight: 500;
       cursor: pointer;
       color: var(--text-2);
-      transition: border-color .12s, color .12s, background .12s;
+      transition: border-color .15s, color .15s, background .15s, box-shadow .15s;
       font-family: inherit;
       letter-spacing: -.01em;
-      min-height: 36px;
-      flex-shrink: 0;
-      white-space: nowrap;
       touch-action: manipulation;
+      white-space: nowrap;
     }
     .preset-chip:hover {
       border-color: var(--primary);
@@ -273,39 +256,50 @@
       background: var(--primary);
       border-color: var(--primary);
       color: #fff;
+      box-shadow: 0 2px 8px rgba(2,132,199,.25);
     }
 
-    /* ── Custom row ── */
-    .custom-row {
+    /* ── Custom distance ── */
+    .dist-custom-wrap {
       display: flex;
-      align-items: center;
-      gap: .45rem;
+      flex-direction: column;
+      gap: .3rem;
+      margin-top: .2rem;
     }
-    .custom-label {
-      font-size: .68rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      white-space: nowrap;
-    }
-
-    /* ── Inputs ── */
-    .input-row {
+    .dist-custom {
       display: flex;
       align-items: center;
       gap: .5rem;
     }
-    .input-group {
+
+    /* ── Input columns (label above input) ── */
+    .input-row {
       display: flex;
-      align-items: center;
+      align-items: flex-end;
       gap: .4rem;
     }
+    .input-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .3rem;
+    }
+    .input-col-label {
+      font-size: .65rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: .04em;
+      line-height: 1;
+    }
+
+    /* ── Inputs ── */
     input[type="number"] {
       width: 3.75rem;
-      min-height: 52px;
-      padding: .5rem .2rem;
-      border: 1px solid var(--border);
+      height: 54px;
+      padding: 0 .2rem;
+      border: 1.5px solid var(--border);
       border-radius: var(--radius-sm);
-      font-size: 1.6rem;
+      font-size: 1.75rem;
       font-weight: 600;
       text-align: center;
       background: #fff;
@@ -318,24 +312,30 @@
       -moz-appearance: textfield;
       appearance: textfield;
     }
+    input[type="number"]::placeholder {
+      color: #c8d5e3;
+      font-size: 1.1rem;
+      font-weight: 400;
+    }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     input[type="number"]:focus {
       border-color: var(--primary);
       box-shadow: 0 0 0 3px rgba(2,132,199,.13);
     }
-    .inp-wide { width: 6rem; }
-    .inp-label {
-      font-size: .8rem;
+    .inp-wide { width: 5.5rem; }
+    .inp-unit {
+      font-size: .9rem;
       font-weight: 600;
       color: var(--text-muted);
+      padding-bottom: .15rem;
     }
     .time-sep, .time-dot {
-      font-size: 1.6rem;
+      font-size: 1.75rem;
       font-weight: 300;
       color: #94a3b8;
       line-height: 1;
-      align-self: center;
+      padding-bottom: .05rem;
     }
 
     /* ── Results cards ── */
@@ -464,6 +464,8 @@
       h1 { font-size: 1.1rem; }
       .subtitle { font-size: .7rem; }
       .unit-btn { padding: .32rem .75rem; font-size: .75rem; }
+      input[type="number"] { font-size: 1.5rem; height: 50px; }
+      input[type="number"]::placeholder { font-size: 1rem; }
     }
 
     @media (max-width: 400px) {
@@ -472,6 +474,8 @@
       .calc-field { padding: 1rem 1rem; }
       .split-row, .pace-table td, .card-title { padding-left: 1rem; padding-right: 1rem; }
       .content-body, .content-section h2 { padding-left: 1rem; padding-right: 1rem; }
+      .preset-chip { height: 42px; font-size: .825rem; padding: 0 .9rem; }
+      .input-row { gap: .3rem; }
     }
   </style>
 </head>
@@ -504,13 +508,14 @@
       <div class="presets-wrap hidden" id="presets-wrap-yd">
         <div class="presets" id="presets-yd"></div>
       </div>
-      <div class="custom-row">
-        <span class="custom-label">Other:</span>
-        <label for="inp-dist" class="sr-only">Distance</label>
-        <input type="number" id="inp-dist" class="inp-wide" min="1" step="1"
-               inputmode="numeric" placeholder="—" oninput="onEdit('distance')"
-               style="font-size:1.3rem; letter-spacing:0">
-        <span class="inp-label" id="dist-unit-label">m</span>
+      <div class="dist-custom-wrap">
+        <span class="input-col-label">Custom</span>
+        <div class="dist-custom">
+          <label for="inp-dist" class="sr-only">Custom distance</label>
+          <input type="number" id="inp-dist" class="inp-wide" min="1" step="1"
+                 inputmode="numeric" placeholder="0" oninput="onEdit('distance')">
+          <span class="inp-unit" id="dist-unit-label">m</span>
+        </div>
       </div>
       <p class="formula-hint hidden" id="hint-distance"></p>
     </div>
@@ -524,18 +529,18 @@
         <span class="result-badge" id="badge-time">Result</span>
       </div>
       <div class="input-row">
-        <div class="input-group">
+        <div class="input-col">
+          <span class="input-col-label">min</span>
           <label for="inp-min" class="sr-only">Minutes</label>
-          <input type="number" id="inp-min" min="0" max="999" placeholder="mm"
-                 inputmode="numeric" oninput="onEdit('time')" style="width:4.5rem">
-          <span class="inp-label">m</span>
+          <input type="number" id="inp-min" min="0" max="999"
+                 inputmode="numeric" placeholder="0" oninput="onEdit('time')" style="width:4.5rem">
         </div>
         <span class="time-sep">:</span>
-        <div class="input-group">
+        <div class="input-col">
+          <span class="input-col-label">sec</span>
           <label for="inp-sec" class="sr-only">Seconds</label>
-          <input type="number" id="inp-sec" min="0" max="59" placeholder="ss"
-                 inputmode="numeric" oninput="onEdit('time')">
-          <span class="inp-label">s</span>
+          <input type="number" id="inp-sec" min="0" max="59"
+                 inputmode="numeric" placeholder="00" oninput="onEdit('time')">
         </div>
       </div>
       <p class="formula-hint hidden" id="hint-time"></p>
@@ -550,20 +555,26 @@
         <span class="result-badge" id="badge-pace">Result</span>
       </div>
       <div class="input-row">
-        <div class="input-group">
+        <div class="input-col">
+          <span class="input-col-label">min</span>
           <label for="inp-pm" class="sr-only">Pace minutes</label>
-          <input type="number" id="inp-pm" min="0" max="99" placeholder="m"
-                 inputmode="numeric" oninput="onEdit('pace')">
-          <span class="inp-label">m</span>
+          <input type="number" id="inp-pm" min="0" max="99"
+                 inputmode="numeric" placeholder="0" oninput="onEdit('pace')">
         </div>
         <span class="time-sep">:</span>
-        <label for="inp-ps" class="sr-only">Pace seconds</label>
-        <input type="number" id="inp-ps" min="0" max="59" placeholder="ss"
-               inputmode="numeric" oninput="onEdit('pace')">
+        <div class="input-col">
+          <span class="input-col-label">sec</span>
+          <label for="inp-ps" class="sr-only">Pace seconds</label>
+          <input type="number" id="inp-ps" min="0" max="59"
+                 inputmode="numeric" placeholder="00" oninput="onEdit('pace')">
+        </div>
         <span class="time-dot">.</span>
-        <label for="inp-ph" class="sr-only">Pace hundredths</label>
-        <input type="number" id="inp-ph" min="0" max="99" placeholder="hh"
-               inputmode="numeric" oninput="onEdit('pace')">
+        <div class="input-col">
+          <span class="input-col-label">/100</span>
+          <label for="inp-ph" class="sr-only">Pace hundredths</label>
+          <input type="number" id="inp-ph" min="0" max="99"
+                 inputmode="numeric" placeholder="00" oninput="onEdit('pace')">
+        </div>
       </div>
       <p class="formula-hint hidden" id="hint-pace"></p>
     </div>
