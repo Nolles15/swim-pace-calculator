@@ -150,6 +150,7 @@
       transition: background .15s, color .15s;
       font-family: inherit;
       letter-spacing: -.01em;
+      touch-action: manipulation;
     }
     .unit-btn.active { background: var(--primary); color: #fff; }
 
@@ -210,13 +211,41 @@
     .formula-hint.hidden { display: none; }
 
     /* ── Preset chips ── */
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .3rem;
+    .presets-wrap {
+      position: relative;
       margin-bottom: .7rem;
     }
+    .presets-wrap.hidden { display: none; }
+    .presets-wrap::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 2rem;
+      background: linear-gradient(to right, transparent, var(--card));
+      pointer-events: none;
+    }
+    .presets {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: .3rem;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding-right: 1.5rem;
+    }
+    .presets::-webkit-scrollbar { display: none; }
     .presets.hidden { display: none; }
+
+    /* ── Visually hidden labels (accessibility) ── */
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden;
+      clip: rect(0,0,0,0);
+      white-space: nowrap;
+      border: 0;
+    }
 
     .preset-chip {
       padding: .38rem .75rem;
@@ -231,6 +260,9 @@
       font-family: inherit;
       letter-spacing: -.01em;
       min-height: 36px;
+      flex-shrink: 0;
+      white-space: nowrap;
+      touch-action: manipulation;
     }
     .preset-chip:hover {
       border-color: var(--primary);
@@ -466,12 +498,18 @@
         <span class="field-name">Distance</span>
         <span class="result-badge" id="badge-distance">Result</span>
       </div>
-      <div class="presets" id="presets-m"></div>
-      <div class="presets hidden" id="presets-yd"></div>
+      <div class="presets-wrap" id="presets-wrap-m">
+        <div class="presets" id="presets-m"></div>
+      </div>
+      <div class="presets-wrap hidden" id="presets-wrap-yd">
+        <div class="presets" id="presets-yd"></div>
+      </div>
       <div class="custom-row">
         <span class="custom-label">Other:</span>
+        <label for="inp-dist" class="sr-only">Distance</label>
         <input type="number" id="inp-dist" class="inp-wide" min="1" step="1"
-               placeholder="—" oninput="onEdit('distance')" style="font-size:1.3rem; letter-spacing:0">
+               inputmode="numeric" placeholder="—" oninput="onEdit('distance')"
+               style="font-size:1.3rem; letter-spacing:0">
         <span class="inp-label" id="dist-unit-label">m</span>
       </div>
       <p class="formula-hint hidden" id="hint-distance"></p>
@@ -487,14 +525,16 @@
       </div>
       <div class="input-row">
         <div class="input-group">
+          <label for="inp-min" class="sr-only">Minutes</label>
           <input type="number" id="inp-min" min="0" max="999" placeholder="mm"
-                 oninput="onEdit('time')" style="width:4.5rem">
+                 inputmode="numeric" oninput="onEdit('time')" style="width:4.5rem">
           <span class="inp-label">m</span>
         </div>
         <span class="time-sep">:</span>
         <div class="input-group">
+          <label for="inp-sec" class="sr-only">Seconds</label>
           <input type="number" id="inp-sec" min="0" max="59" placeholder="ss"
-                 oninput="onEdit('time')">
+                 inputmode="numeric" oninput="onEdit('time')">
           <span class="inp-label">s</span>
         </div>
       </div>
@@ -511,16 +551,19 @@
       </div>
       <div class="input-row">
         <div class="input-group">
+          <label for="inp-pm" class="sr-only">Pace minutes</label>
           <input type="number" id="inp-pm" min="0" max="99" placeholder="m"
-                 oninput="onEdit('pace')">
+                 inputmode="numeric" oninput="onEdit('pace')">
           <span class="inp-label">m</span>
         </div>
         <span class="time-sep">:</span>
+        <label for="inp-ps" class="sr-only">Pace seconds</label>
         <input type="number" id="inp-ps" min="0" max="59" placeholder="ss"
-               oninput="onEdit('pace')">
+               inputmode="numeric" oninput="onEdit('pace')">
         <span class="time-dot">.</span>
+        <label for="inp-ph" class="sr-only">Pace hundredths</label>
         <input type="number" id="inp-ph" min="0" max="99" placeholder="hh"
-               oninput="onEdit('pace')">
+               inputmode="numeric" oninput="onEdit('pace')">
       </div>
       <p class="formula-hint hidden" id="hint-pace"></p>
     </div>
@@ -692,8 +735,8 @@
       if (pace !== null) setPaceInput(pace / 0.9144);
     }
     unit = newUnit;
-    document.getElementById('presets-m').classList.toggle('hidden', unit !== 'm');
-    document.getElementById('presets-yd').classList.toggle('hidden', unit !== 'yd');
+    document.getElementById('presets-wrap-m').classList.toggle('hidden', unit !== 'm');
+    document.getElementById('presets-wrap-yd').classList.toggle('hidden', unit !== 'yd');
     document.getElementById('dist-unit-label').textContent = unit;
     document.getElementById('pace-label').textContent = `Pace / 100${unit}`;
     document.querySelectorAll('.preset-chip').forEach(el => el.classList.remove('active'));
