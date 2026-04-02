@@ -15,6 +15,13 @@
   <meta property="og:url"         content="https://swimpace.app/">
   <meta property="og:title"       content="Swim Pace Calculator">
   <meta property="og:description" content="Convert distance + time to swim pace per 100m or 100yd — or calculate total swim time from pace. Free, instant, works for pool and open water.">
+  <meta property="og:image"       content="https://swimpace.app/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card"        content="summary_large_image">
+  <meta name="twitter:title"       content="Swim Pace Calculator">
+  <meta name="twitter:description" content="Convert distance + time to swim pace per 100m or 100yd — or calculate total swim time from pace. Free, instant, works for pool and open water.">
+  <meta name="twitter:image"       content="https://swimpace.app/og-image.png">
 
   <!-- Structured data: WebApplication -->
   <script type="application/ld+json">
@@ -25,6 +32,7 @@
     "description": "Calculate swim pace per 100m or 100yd from distance and time, or find total swim time from pace and distance. Supports meters and yards.",
     "applicationCategory": "SportsApplication",
     "operatingSystem": "Web",
+    "url": "https://swimpace.app/",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "featureList": [
       "Bidirectional pace calculation",
@@ -457,6 +465,19 @@
       padding: 2rem 0 .5rem;
       font-size: .68rem;
       color: var(--text-muted);
+    }
+    footer nav {
+      margin-bottom: .5rem;
+    }
+    footer nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+    footer nav a:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    footer p {
       opacity: .4;
     }
 
@@ -668,7 +689,14 @@
     </div>
   </div>
 
-  <footer>Swim Pace Calculator &mdash; free &amp; runs entirely in your browser</footer>
+  <footer>
+    <nav>
+      <a href="https://runpace.app/">Run Pace Calculator</a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://bikepace.app/">Bike Pace Calculator</a>
+    </nav>
+    <p>Swim Pace Calculator &mdash; free &amp; runs entirely in your browser</p>
+  </footer>
 
 </div><!-- /.container -->
 
